@@ -1,0 +1,27 @@
+{
+  "name": "@bybackfish/buncord",
+  "exports": "./src/index.ts",
+  "private": false,
+  "version": "0.0.3",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "index.ts",
+  "description": "A command framework for Discord.js, made with Bun",
+  "scripts": {
+    "build": "bun build --target=node ./src/index.ts --outfile=dist/index.js && bun run build:declaration && bun run build:alias",
+    "build:declaration": "tsc --emitDeclarationOnly --project tsconfig.types.json",
+    "build:alias": "tsc-alias",
+    "postbuild": "rm -rf tsconfig.types.tsbuildinfo",
+    "link": "bun run build && bun link"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1",
+    "glob": "^10.3.10"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  },
+  "files": [
+    "dist"
+  ]
+}
