@@ -12,18 +12,17 @@ import { CommandHandlerOptions } from '@struct/commands/CommandHandler';
 
 export class CommandHandler {
   private commands: Map<string, BunCommand> = new Map();
-  constructor(
-    private client: BunClient,
-    private options: CommandHandlerOptions
-  ) {}
+  constructor(private client: BunClient) {}
 
   public async loadCommands(): Promise<void> {
-    sync(`${this.options.path}**/*.ts`).forEach(async (file) => {
-      let required = await require(file);
-      const command: BunCommand = new required.default();
-      command.client = this.client;
-      this.commands.set(command.name, command);
-    });
+    sync(`${this.client.options.commands.commandDirPath}**/*.ts`).forEach(
+      async (file) => {
+        let required = await require(file);
+        const command: BunCommand = new required.default();
+        command.client = this.client;
+        this.commands.set(command.name, command);
+      }
+    );
   }
 
   public registerCommands(): void {
@@ -48,8 +47,7 @@ export class CommandHandler {
 
     if (!command) return;
 
-    if (this.client.bunClientOptions.commands?.default.autoDefer == true)
-      await interaction.deferReply();
+    if (this.client.options.commands.autoDefer) await interaction.deferReply();
 
     let args: Record<string, any> = {};
 
@@ -82,7 +80,7 @@ export class CommandHandler {
       response = result as InteractionReplyOptions;
     }
 
-    if (this.client.bunClientOptions.commands?.default.useEphemeral == true) {
+    if (this.client.options.commands.useEphemeral) {
       response.ephemeral = true;
     }
 

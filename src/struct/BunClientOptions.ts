@@ -1,40 +1,26 @@
-import { ClientOptions, IntentsBitField, Snowflake } from "discord.js";
+import { ClientOptions, IntentsBitField, Snowflake } from 'discord.js';
 
 type BunClientOptions = {
   groups?: {
     owners: Snowflake[];
     developers: Snowflake[];
   };
-  commands?: {
-    default: {
-      allowBots: boolean;
-      allowDM: boolean;
-      allowGuild: boolean;
-      allowNSFW: boolean;
-      allowThread: boolean;
-      allowForum: boolean;
+  commands: {
+    commandDirPath: string;
 
-      autoDefer: boolean;
-      useEphemeral: boolean;
-      autoEmbed: boolean;
-    };
-  };
+    allowBots?: boolean;
+    allowDM?: boolean;
+    allowGuild?: boolean;
+    allowNSFW?: boolean;
+    allowThread?: boolean;
+    allowForum?: boolean;
 
-  whitelist?: {
-    whitelistEnabled: boolean;
-    guilds: {
-      [guildID: Snowflake]: {
-        isBlacklisted: boolean;
-        isWhitelisted: boolean;
-      };
-    };
+    autoDefer?: boolean;
+    useEphemeral?: boolean;
   };
 
   token: string;
 };
 
-type FinalOptions = /*Omit<ClientOptions, 'intents'> & {
-  intents: IntentsBitField;
-} & BunClientOptions;
-*/ BunClientOptions & ClientOptions;
+type FinalOptions = BunClientOptions & ClientOptions;
 export { FinalOptions as BunClientOptions };
