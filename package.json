@@ -10,7 +10,7 @@
     "build": "bun build --target=bun ./src/index.ts --outfile=dist/index.js && bun run build:declaration && bun run build:alias",
     "build:declaration": "tsc --emitDeclarationOnly --project tsconfig.types.json",
     "build:alias": "tsc-alias",
-    "postbuild": "rm -rf tsconfig.types.tsbuildinfo",
+    "postbuild": "rm tsconfig.types.tsbuildinfo",
     "link": "bun run build && bun link",
     "prepublishOnly": "bun run build"
   },

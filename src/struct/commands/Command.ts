@@ -1,5 +1,10 @@
-import { EmbedBuilder, Snowflake } from "discord.js";
-import { CommandArgument } from "./CommandArgument";
+import {
+  Embed,
+  EmbedBuilder,
+  InteractionReplyOptions,
+  Snowflake,
+} from 'discord.js';
+import { CommandArgument } from './CommandArgument';
 
 export interface Command {
   description: string;
@@ -14,9 +19,8 @@ export interface Command {
 }
 
 export type CommandReturnable =
-  | void
   | Promise<void>
-  | EmbedBuilder
   | Promise<EmbedBuilder>
-  | string
-  | Promise<string>;
+  | Promise<EmbedBuilder[]>
+  | Promise<string>
+  | Promise<InteractionReplyOptions>;

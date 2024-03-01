@@ -2,17 +2,19 @@ import {
   ApplicationCommandData,
   AutocompleteInteraction,
   CommandInteraction,
+  EmbedBuilder,
   Interaction,
-} from "discord.js";
-import { BunClient, BunCommand } from "@client";
-import { sync } from "glob";
-import { CommandHandlerOptions } from "@struct/commands/CommandHandler";
+  InteractionReplyOptions,
+} from 'discord.js';
+import { BunClient, BunCommand } from '@client';
+import { sync } from 'glob';
+import { CommandHandlerOptions } from '@struct/commands/CommandHandler';
 
 export class CommandHandler {
   private commands: Map<string, BunCommand> = new Map();
   constructor(
     private client: BunClient,
-    private options: CommandHandlerOptions,
+    private options: CommandHandlerOptions
   ) {}
 
   public async loadCommands(): Promise<void> {
@@ -63,11 +65,34 @@ export class CommandHandler {
       }
     }
 
-    await command.execute(interaction, args);
+    let result = await command.execute(interaction, args);
+
+    let response: InteractionReplyOptions = {};
+
+    if (result instanceof EmbedBuilder) {
+      response.embeds = [...(response.embeds || []), result];
+    } else if (typeof result === 'string') {
+      response.content = result;
+    } else if (
+      Array.isArray(result) &&
+      result.every((embed) => embed instanceof EmbedBuilder)
+    ) {
+      response.embeds = result as EmbedBuilder[];
+    } else if (typeof result === 'object') {
+      response = result as InteractionReplyOptions;
+    }
+
+    if (this.client.bunClientOptions.commands?.default.useEphemeral == true) {
+      response.ephemeral = true;
+    }
+
+    if (response) {
+      await interaction.reply(response);
+    }
   }
 
   private async handleAutocomplete(
-    interaction: AutocompleteInteraction,
+    interaction: AutocompleteInteraction
   ): Promise<void> {
     const command = this.commands.get(interaction.commandName);
 
@@ -77,7 +102,7 @@ export class CommandHandler {
 
     if (name) {
       const option = command.options.options?.find(
-        (option) => option.name === name,
+        (option) => option.name === name
       );
 
       if (!option) return;
