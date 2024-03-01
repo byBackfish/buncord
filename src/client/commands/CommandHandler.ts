@@ -87,7 +87,9 @@ export class CommandHandler {
     }
 
     if (response) {
-      await interaction.reply(response);
+      if (interaction.replied || interaction.deferred)
+        interaction.editReply(response);
+      else interaction.reply(response);
     }
   }
 
