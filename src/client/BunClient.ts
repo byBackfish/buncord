@@ -2,10 +2,7 @@ import { Client, Interaction } from 'discord.js';
 import { BunClientOptions } from '@struct/BunClientOptions.js';
 import { CommandHandlerOptions } from '@struct/commands/CommandHandler.js';
 import { CommandHandler } from '@client/commands/CommandHandler.js';
-import {
-  Interactable,
-  InteractionAwaiter,
-} from './interactions/InteractionAwaiter';
+import { InteractionAwaiter } from './interactions/InteractionAwaiter';
 export class BunClient extends Client {
   private commandHandler?: CommandHandler;
   private interactionAwaiter?: InteractionAwaiter;
@@ -37,8 +34,11 @@ export class BunClient extends Client {
     return super.destroy();
   }
 
-  public await(customId: string, maxUses = 1): Promise<Interactable> {
-    return this.interactionAwaiter!!.await(customId, maxUses);
+  public await<T extends Interaction>(
+    customId: string,
+    maxUses = 1
+  ): Promise<T> {
+    return this.interactionAwaiter!!.await<T>(customId, maxUses);
   }
 
   public makeRandom(customId: string): string {

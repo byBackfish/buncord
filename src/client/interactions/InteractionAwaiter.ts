@@ -1,19 +1,11 @@
-import {
-  ButtonInteraction,
-  CommandInteraction,
-  Interaction,
-  MessageComponentInteraction,
-  MessageInteraction,
-  ModalSubmitInteraction,
-  SelectMenuInteraction,
-} from 'discord.js';
+import { Interaction } from 'discord.js';
 import { BunClient } from '..';
 
 export class InteractionAwaiter {
   private awaitMap: Map<
     string,
     {
-      resolve: (value: Interactable | PromiseLike<Interactable>) => void;
+      resolve: <T extends Interaction>(value: T) => void;
       maxUses: number;
       currentUses: number;
     }
@@ -36,21 +28,20 @@ export class InteractionAwaiter {
     });
   }
 
-  async await(customId: IDResolvable, maxUses = 1): Promise<Interactable> {
-    return new Promise<Interactable>((resolve) => {
+  async await<T extends Interaction>(
+    customId: IDResolvable,
+    maxUses = 1
+  ): Promise<T> {
+    return new Promise<T>((resolve) => {
       let pair = {
-        maxUses,
         resolve,
+        maxUses,
         currentUses: 0,
       };
+      //@ts-expect-error
       this.awaitMap.set(customId, pair);
     });
   }
 }
 
 type IDResolvable = `${string}:${string}:${string}` | string;
-
-export type Interactable =
-  | ButtonInteraction
-  | ModalSubmitInteraction
-  | SelectMenuInteraction;
