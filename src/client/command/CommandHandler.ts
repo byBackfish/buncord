@@ -66,22 +66,28 @@ export class CommandHandler {
 
     let response: InteractionReplyOptions = {};
 
-    if (result instanceof EmbedBuilder) {
-      response.embeds = [...(response.embeds || []), result];
-    } else if (typeof result === "string") {
+    if (typeof result === "string") {
       response.content = result;
-    } else if (
-      Array.isArray(result) &&
-      result.every((embed) => embed instanceof EmbedBuilder)
-    ) {
-      response.embeds = result as EmbedBuilder[];
     } else if (typeof result === "object") {
-      response = result as InteractionReplyOptions;
+      let isArray = Array.isArray(result);
+      if (isArray) {
+        response.embeds = result as EmbedBuilder[];
+      } else {
+        let isEmbed = (result as any).data?.title;
+        if (isEmbed) {
+          response.embeds = [result as EmbedBuilder];
+        } else {
+          response = result as InteractionReplyOptions;
+        }
+      }
     }
 
     if (this.client.options.commands.useEphemeral) {
       response.ephemeral = true;
     }
+
+    console.log("typeof", typeof response);
+    console.log("cosntructname", response.constructor.name);
 
     if (response && Object.keys(response).length >= 1) {
       if (interaction.replied || interaction.deferred)
