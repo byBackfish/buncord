@@ -11,8 +11,6 @@ export class BunConsole {
       process.env.NODE_ENV === "production" ? "info" : "debug"
     );
     this.template = new Timestamp("DD/MM/YYYY @ HH:mm:ss");
-
-    this.log("Test Info");
   }
 
   get timestamp() {
