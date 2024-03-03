@@ -3,17 +3,16 @@ import {
   ClientOptions,
   IntentsBitField,
   Interaction,
-} from 'discord.js';
-import { BunClientOptions } from '@struct/BunClientOptions.js';
-import { CommandHandlerOptions } from '@struct/commands/CommandHandler.js';
-import { CommandHandler } from '@client/commands/CommandHandler.js';
-import { InteractionAwaiter } from './interactions/InteractionAwaiter';
+} from "discord.js";
+import { BunClientOptions } from "@struct/BunClientOptions.js";
+import { CommandHandler } from "@client/commands/CommandHandler.js";
+import { InteractionAwaiter } from "./interactions/InteractionAwaiter";
 export class BunClient extends Client {
   private commandHandler?: CommandHandler;
   private interactionAwaiter?: InteractionAwaiter;
 
   declare options: BunClientOptions &
-    Omit<ClientOptions, 'intents'> & { intents: IntentsBitField };
+    Omit<ClientOptions, "intents"> & { intents: IntentsBitField };
 
   constructor(options: BunClientOptions) {
     super(options);
@@ -21,12 +20,12 @@ export class BunClient extends Client {
     this.commandHandler = new CommandHandler(this);
     this.commandHandler.loadCommands();
 
-    this.on('ready', () => {
+    this.on("ready", () => {
       this.interactionAwaiter = new InteractionAwaiter(this);
       this.commandHandler?.registerCommands();
     });
 
-    this.on('interactionCreate', async (interaction: Interaction) => {
+    this.on("interactionCreate", async (interaction: Interaction) => {
       this.commandHandler?.handleInteraction(interaction);
     });
   }

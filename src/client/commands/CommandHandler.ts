@@ -5,10 +5,9 @@ import {
   EmbedBuilder,
   Interaction,
   InteractionReplyOptions,
-} from 'discord.js';
-import { BunClient, BunCommand } from '@client';
-import { sync } from 'glob';
-import { CommandHandlerOptions } from '@struct/commands/CommandHandler';
+} from "discord.js";
+import { BunClient, BunCommand } from "@client";
+import { sync } from "glob";
 
 export class CommandHandler {
   private commands: Map<string, BunCommand> = new Map();
@@ -69,14 +68,14 @@ export class CommandHandler {
 
     if (result instanceof EmbedBuilder) {
       response.embeds = [...(response.embeds || []), result];
-    } else if (typeof result === 'string') {
+    } else if (typeof result === "string") {
       response.content = result;
     } else if (
       Array.isArray(result) &&
       result.every((embed) => embed instanceof EmbedBuilder)
     ) {
       response.embeds = result as EmbedBuilder[];
-    } else if (typeof result === 'object') {
+    } else if (typeof result === "object") {
       response = result as InteractionReplyOptions;
     }
 
@@ -84,7 +83,7 @@ export class CommandHandler {
       response.ephemeral = true;
     }
 
-    if (response) {
+    if (response && Object.keys(response).length >= 1) {
       if (interaction.replied || interaction.deferred)
         interaction.editReply(response);
       else interaction.reply(response);
