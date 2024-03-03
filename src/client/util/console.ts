@@ -1,5 +1,5 @@
 import { Timestamp } from "@skyra/timestamp";
-import * as Logger from "node-color-log";
+import Logger from "node-color-log";
 
 export class BunConsole {
   logger: typeof Logger;
@@ -11,6 +11,8 @@ export class BunConsole {
       process.env.NODE_ENV === "production" ? "info" : "debug"
     );
     this.template = new Timestamp("DD/MM/YYYY @ HH:mm:ss");
+
+    this.log("Test Info");
   }
 
   get timestamp() {

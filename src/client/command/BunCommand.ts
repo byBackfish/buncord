@@ -2,7 +2,7 @@ import { Command, CommandReturnable } from "@/struct/command/Command";
 import {
   CommandArgument,
   CommandArgumentChoices,
-} from "@/struct/command/CommandArgument";
+} from "@struct/command/CommandArgument";
 import {
   ApplicationCommandChoicesData,
   ApplicationCommandData,

@@ -13,7 +13,7 @@ export class BunClient extends Client {
   private commandHandler: CommandHandler;
   private interactionAwaiter: InteractionAwaiter;
   private listenerHandler: ListenerHandler;
-  private console: BunConsole;
+  public console: BunConsole;
 
   declare options: BunClientOptions &
     Omit<ClientOptions, "intents"> & { intents: IntentsBitField };

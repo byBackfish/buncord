@@ -2,7 +2,8 @@ import { BunClient } from "..";
 import { ClientEvents } from "discord.js";
 
 export class BunListener<T extends keyof ClientEvents> {
-  public client: BunClient | undefined;
+  //@ts-expect-error
+  public client: BunClient;
 
   constructor(public event: T) {}
 
