@@ -1,4 +1,4 @@
-import { ClientOptions, IntentsBitField, Snowflake } from 'discord.js';
+import { ClientOptions, IntentsBitField, Snowflake } from "discord.js";
 
 type BunClientOptions = {
   groups?: {
@@ -17,6 +17,10 @@ type BunClientOptions = {
 
     autoDefer?: boolean;
     useEphemeral?: boolean;
+  };
+
+  listeners: {
+    listenerDirPath: string;
   };
 
   token: string;

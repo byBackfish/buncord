@@ -5,11 +5,15 @@ import {
   Interaction,
 } from "discord.js";
 import { BunClientOptions } from "@struct/BunClientOptions.js";
-import { CommandHandler } from "@client/commands/CommandHandler.js";
-import { InteractionAwaiter } from "./interactions/InteractionAwaiter";
+import { CommandHandler } from "@client/command/CommandHandler.js";
+import { InteractionAwaiter } from "./interaction/InteractionAwaiter";
+import { BunConsole } from "./util/console";
+import { ListenerHandler } from ".";
 export class BunClient extends Client {
-  private commandHandler?: CommandHandler;
-  private interactionAwaiter?: InteractionAwaiter;
+  private commandHandler: CommandHandler;
+  private interactionAwaiter: InteractionAwaiter;
+  private listenerHandler: ListenerHandler;
+  private console: BunConsole;
 
   declare options: BunClientOptions &
     Omit<ClientOptions, "intents"> & { intents: IntentsBitField };
@@ -20,8 +24,13 @@ export class BunClient extends Client {
     this.commandHandler = new CommandHandler(this);
     this.commandHandler.loadCommands();
 
+    this.listenerHandler = new ListenerHandler(this);
+
+    this.interactionAwaiter = new InteractionAwaiter(this);
+
+    this.console = new BunConsole();
+
     this.on("ready", () => {
-      this.interactionAwaiter = new InteractionAwaiter(this);
       this.commandHandler?.registerCommands();
     });
 

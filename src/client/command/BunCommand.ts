@@ -1,8 +1,8 @@
-import { Command, CommandReturnable } from "@struct/commands/Command";
+import { Command, CommandReturnable } from "@/struct/command/Command";
 import {
   CommandArgument,
   CommandArgumentChoices,
-} from "@struct/commands/CommandArgument";
+} from "@/struct/command/CommandArgument";
 import {
   ApplicationCommandChoicesData,
   ApplicationCommandData,
@@ -35,12 +35,12 @@ export class BunCommand {
 
   constructor(
     public name: string,
-    public options: Command,
+    public options: Command
   ) {}
 
   async execute(
     interaction: CommandInteraction,
-    args: Record<string, any>,
+    args: Record<string, any>
   ): Promise<CommandReturnable> {}
 
   private buildJSON(): ApplicationCommandData {
@@ -86,7 +86,7 @@ export class BunCommand {
   }
 
   private buildChoices(
-    choices: CommandArgumentChoices,
+    choices: CommandArgumentChoices
   ): ApplicationCommandOptionChoiceData<string | number>[] {
     if (typeof choices === "function") {
       return choices(this.client!!);
