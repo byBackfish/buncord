@@ -5,6 +5,7 @@ import {
   EmbedBuilder,
   Interaction,
   InteractionReplyOptions,
+  ModalBuilder,
 } from 'discord.js';
 import { BunClient, BunCommand } from '@client';
 import { sync } from 'glob';
@@ -73,9 +74,12 @@ export class CommandHandler {
       if (isArray) {
         response.embeds = result as EmbedBuilder[];
       } else {
-        let isEmbed = (result as any).data?.title;
+        let isEmbed = (result as any).data?.footer;
+        let isModal = (result as any).data?.title;
         if (isEmbed) {
           response.embeds = [result as EmbedBuilder];
+        } else if (isModal) {
+          return interaction.showModal(result as ModalBuilder);
         } else {
           response = result as InteractionReplyOptions;
         }

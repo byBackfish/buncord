@@ -1,0 +1,4 @@
+- Command permission checking (userCommands, clientCommands)
+- Constraint checking (ownerOnly, guildOnly, directOnly)
+
+- QoL: Move required arguments to the top automatically
