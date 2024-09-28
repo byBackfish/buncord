@@ -1,6 +1,7 @@
 import { BunClient, BunListener } from "@client";
 import { ClientEvents } from "discord.js";
 import { sync } from "glob";
+import { resolve } from "path";
 
 export class ListenerHandler {
   constructor(private client: BunClient) {
@@ -8,9 +9,11 @@ export class ListenerHandler {
   }
 
   public async loadListeners() {
-    sync(`${this.client.options.listeners.listenerDirPath}**/*.ts`).forEach(
+    const path = resolve(this.client.options.listeners.listenerDirPath);
+    sync(`${path}/*.ts`).forEach(
       async (file) => {
-        let required = await require(file);
+        const filePath = resolve(file);
+        let required = await require(filePath);
         const listener = new required.default();
         listener.client = this.client;
 

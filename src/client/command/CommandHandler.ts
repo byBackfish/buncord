@@ -9,15 +9,18 @@ import {
 } from 'discord.js';
 import { BunClient, BunCommand } from '@client';
 import { sync } from 'glob';
+import { resolve } from 'path'
 
 export class CommandHandler {
   private commands: Map<string, BunCommand> = new Map();
   constructor(private client: BunClient) {}
 
   public async loadCommands(): Promise<void> {
-    sync(`${this.client.options.commands.commandDirPath}**/*.ts`).forEach(
+    const path = resolve(this.client.options.commands.commandDirPath);
+    sync(`${path}/*.ts`).forEach(
       async (file) => {
-        let required = await require(file);
+        const filePath = resolve(file);
+        let required = await require(filePath);
         const command: BunCommand = new required.default();
         command.client = this.client;
         this.commands.set(command.name, command);
