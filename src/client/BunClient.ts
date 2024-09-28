@@ -9,10 +9,10 @@ import { CommandHandler } from "@client/command/CommandHandler.js";
 import { InteractionAwaiter } from "./interaction/InteractionAwaiter";
 import { BunConsole } from "./util/console";
 import { ListenerHandler } from ".";
-export class BunClient extends Client {
-  private commandHandler: CommandHandler;
+export class BunClient<CustomClient extends BunClient<CustomClient>> extends Client {
+  private commandHandler: CommandHandler<CustomClient>;
   private interactionAwaiter: InteractionAwaiter;
-  private listenerHandler: ListenerHandler;
+  private listenerHandler: ListenerHandler<CustomClient>;
   public console: BunConsole;
 
   declare options: BunClientOptions &
@@ -21,9 +21,11 @@ export class BunClient extends Client {
   constructor(options: BunClientOptions) {
     super(options);
 
+    // @ts-expect-error
     this.commandHandler = new CommandHandler(this);
     this.commandHandler.loadCommands();
 
+    // @ts-expect-error
     this.listenerHandler = new ListenerHandler(this);
 
     this.interactionAwaiter = new InteractionAwaiter(this);

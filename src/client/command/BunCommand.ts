@@ -15,7 +15,7 @@ import {
 } from "discord.js";
 import { BunClient } from "..";
 
-export class BunCommand {
+export class BunCommand<CustomClient extends BunClient> {
   static Type = {
     SUB_COMMAND: 1,
     SUB_COMMAND_GROUP: 2,
@@ -31,7 +31,7 @@ export class BunCommand {
   };
 
   // @ts-ignore
-  client: BunClient;
+  client: CustomClient;
 
   constructor(
     public name: string,
