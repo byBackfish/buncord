@@ -14,8 +14,8 @@ export interface CommandArgument {
   maxLength?: number;
 
   autocomplete?: boolean;
-  onAutocomplete?: (
-    client: BunClient,
+  onAutocomplete?: <CustomClient extends BunClient<CustomClient>>(
+    client: CustomClient,
     interaction: AutocompleteInteraction,
   ) => Promise<CommandArgumentChoiceFixed[]>;
 
@@ -26,8 +26,8 @@ type CommandArgumentChoiceFixed = {
   name: string;
   value: string | number;
 };
-type CommandArgumentChoiceFunction = (
-  client: BunClient,
+type CommandArgumentChoiceFunction = <CustomClient extends BunClient<CustomClient>>(
+  client: CustomClient,
 ) => CommandArgumentChoiceFixed[];
 
 export type CommandArgumentChoices =

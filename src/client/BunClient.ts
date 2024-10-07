@@ -11,7 +11,7 @@ import { BunConsole } from "./util/console";
 import { ListenerHandler } from ".";
 export class BunClient<CustomClient extends BunClient<CustomClient>> extends Client {
   private commandHandler: CommandHandler<CustomClient>;
-  private interactionAwaiter: InteractionAwaiter;
+  private interactionAwaiter: InteractionAwaiter<CustomClient>;
   private listenerHandler: ListenerHandler<CustomClient>;
   public console: BunConsole;
 
@@ -28,6 +28,7 @@ export class BunClient<CustomClient extends BunClient<CustomClient>> extends Cli
     // @ts-expect-error
     this.listenerHandler = new ListenerHandler(this);
 
+    // @ts-expect-error
     this.interactionAwaiter = new InteractionAwaiter(this);
 
     this.console = new BunConsole();

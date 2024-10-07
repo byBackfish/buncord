@@ -11,7 +11,7 @@ import { BunClient, BunCommand } from '@client';
 import { sync } from 'glob';
 import { resolve } from 'path'
 
-export class CommandHandler<CustomClient extends BunClient> {
+export class CommandHandler<CustomClient extends BunClient<CustomClient>> {
   private commands: Map<string, BunCommand<CustomClient>> = new Map();
   constructor(private client: CustomClient) {}
 

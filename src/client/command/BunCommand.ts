@@ -15,7 +15,7 @@ import {
 } from "discord.js";
 import { BunClient } from "..";
 
-export class BunCommand<CustomClient extends BunClient> {
+export class BunCommand<CustomClient extends BunClient<CustomClient>> {
   static Type = {
     SUB_COMMAND: 1,
     SUB_COMMAND_GROUP: 2,

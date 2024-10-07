@@ -1,7 +1,7 @@
 import { Interaction } from 'discord.js';
 import { BunClient } from '..';
 
-export class InteractionAwaiter {
+export class InteractionAwaiter<CustomClient extends BunClient<CustomClient>> {
   private awaitMap: Map<
     string,
     {
@@ -11,7 +11,7 @@ export class InteractionAwaiter {
     }
   > = new Map();
 
-  constructor(public client: BunClient) {
+  constructor(public client: CustomClient) {
     this.client.on('interactionCreate', (interaction: Interaction) => {
       //@ts-expect-error
       let customId = interaction.customId;

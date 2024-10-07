@@ -3,7 +3,7 @@ import { ClientEvents } from "discord.js";
 import { sync } from "glob";
 import { resolve } from "path";
 
-export class ListenerHandler<CustomClient extends BunClient> {
+export class ListenerHandler<CustomClient extends BunClient<CustomClient>> {
   constructor(private client: CustomClient) {
     this.loadListeners();
   }
