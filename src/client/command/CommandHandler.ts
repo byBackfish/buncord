@@ -57,7 +57,7 @@ export class CommandHandler<CustomClient extends BunClient<CustomClient>> {
     for (let argument of command.options.options ?? []) {
       if (interaction.options.get(argument.name) !== undefined) {
         if (argument.type == BunCommand.Type.USER) {
-          args[argument.name] = interaction.options.getUser(argument.name);
+          args[argument.name] = interaction.options.get(argument.name);
         } else {
           args[argument.name] = interaction.options.get(argument.name)?.value;
         }
