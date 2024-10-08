@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 import { BunClientOptions } from "@struct/BunClientOptions.js";
 import { CommandHandler } from "@client/command/CommandHandler.js";
-import { InteractionAwaiter } from "./interaction/InteractionAwaiter";
+import { CustomListener, InteractionAwaiter } from "./interaction/InteractionAwaiter";
 import { BunConsole } from "./util/console";
 import { ListenerHandler } from ".";
 export class BunClient<CustomClient extends BunClient<CustomClient>> extends Client {
@@ -53,7 +53,7 @@ export class BunClient<CustomClient extends BunClient<CustomClient>> extends Cli
   public await<T extends Interaction>(
     customId: string,
     maxUses = 1
-  ): Promise<T> {
+  ): CustomListener<T> {
     return this.interactionAwaiter!!.await<T>(customId, maxUses);
   }
 

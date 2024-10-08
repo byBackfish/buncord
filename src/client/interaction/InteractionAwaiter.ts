@@ -5,7 +5,7 @@ export class InteractionAwaiter<CustomClient extends BunClient<CustomClient>> {
   private awaitMap: Map<
     string,
     {
-      resolve: <T extends Interaction>(value: T) => void;
+      resolve: (value: any) => void;
       maxUses: number;
       currentUses: number;
     }
@@ -28,20 +28,30 @@ export class InteractionAwaiter<CustomClient extends BunClient<CustomClient>> {
     });
   }
 
-  async await<T extends Interaction>(
+await<T extends Interaction>(
     customId: IDResolvable,
     maxUses = 1
-  ): Promise<T> {
-    return new Promise<T>((resolve) => {
-      let pair = {
-        resolve,
-        maxUses,
-        currentUses: 0,
-      };
-      //@ts-expect-error
-      this.awaitMap.set(customId, pair);
+  ): CustomListener<T> {
+    const listener = new CustomListener<T>();
+    this.awaitMap.set(customId, {
+      resolve: listener.resolve.bind(listener),
+      maxUses,
+      currentUses: 0,
     });
+    return listener
   }
+}
+
+export class CustomListener<T> {
+    private resolvers: ((data: T) => void)[] = [];
+    then(callback: (data: T) => void) {
+        this.resolvers.push(callback);
+    }
+    resolve(data: T) {
+        for (let resolver of this.resolvers) {
+            resolver(data);
+        }
+    }
 }
 
 type IDResolvable = `${string}:${string}:${string}` | string;
