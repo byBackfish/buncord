@@ -1,4 +1,7 @@
-- Command permission checking (userCommands, clientCommands)
-- Constraint checking (ownerOnly, guildOnly, directOnly)
-
-- QoL: Move required arguments to the top automatically
+- Consider: guild-scoped registration for commands with guildIDs
+  (currently global registration + runtime check)
+- Consider: persistent component router (defineButton etc.) — deferred
+  until a real long-lived-UI use case; one-shot awaits + plain builder
+  functions cover current needs (see README conventions)
+- Consider: shared cooldown store (currently per-process memory)
+- QoL: warn (not just fail) when required options follow optional ones

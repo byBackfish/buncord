@@ -1,12 +1,13 @@
 {
   "name": "@bybackfish/buncord",
   "private": false,
-  "version": "0.3.5",
+  "version": "0.4.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "module": "index.ts",
   "description": "A command framework for Discord.js, made with Bun",
+  "workspaces": ["examples"],
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "build": "bun build --target=bun ./src/index.ts --outfile=dist/index.js && bun run build:declaration && bun run build:alias",
     "build:declaration": "tsc --emitDeclarationOnly --project tsconfig.types.json",
     "build:alias": "tsc-alias",
@@ -20,8 +21,11 @@
     "node-color-log": "7.0.0"
   },
   "devDependencies": {
-    "discord.js": "^14.16.3",
-    "prettier": "^3.2.5"
+    "@types/bun": "^1.3.5",
+    "discord.js": "^14.27.0",
+    "prettier": "^3.2.5",
+    "tsc-alias": "^1.9.5",
+    "typescript": "~5.9.3"
   },
   "files": [
     "dist"

@@ -1,14 +1,12 @@
-import { ClientOptions, IntentsBitField, Snowflake } from "discord.js";
+import { ClientOptions, Snowflake } from "discord.js";
+import type { Precondition } from "./command/Command";
 
 type BunClientOptions = {
-  groups?: {
-    owners: Snowflake[];
-    developers: Snowflake[];
-  };
-  commands: {
-    commandDirPath: string;
+  /** User IDs allowed to run `ownerOnly` commands. */
+  owners?: Snowflake[];
+  commands?: {
+    commandDirPath?: string;
 
-    allowBots?: boolean;
     allowDM?: boolean;
     allowGuild?: boolean;
     allowNSFW?: boolean;
@@ -17,13 +15,17 @@ type BunClientOptions = {
 
     autoDefer?: boolean;
     useEphemeral?: boolean;
+    /** Reply sent when a command throws. Per-command `errorMessage` wins. */
+    errorMessage?: string;
+    /** Global checks run for every command before its own preconditions. */
+    preconditions?: Precondition[];
   };
 
-  listeners: {
-    listenerDirPath: string;
+  listeners?: {
+    listenerDirPath?: string;
   };
 
-  token: string;
+  token?: string;
 };
 
 type FinalOptions = BunClientOptions & ClientOptions;

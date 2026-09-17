@@ -1,70 +1,156 @@
 import {
   Client,
   ClientOptions,
+  Events,
   IntentsBitField,
   Interaction,
 } from "discord.js";
-import { BunClientOptions } from "@struct/BunClientOptions.js";
+import type { BunClientOptions } from "@struct/BunClientOptions.js";
 import { CommandHandler } from "@client/command/CommandHandler.js";
-import { CustomListener, InteractionAwaiter } from "./interaction/InteractionAwaiter";
+import {
+  InteractionAwaiter,
+  type AwaitInteractionOptions,
+  type CollectOptions,
+  type InteractionCollector,
+} from "./interaction/InteractionAwaiter";
 import { BunConsole } from "./util/console";
+import { createCustomId, parseCustomId } from "./util/customId";
 import { ListenerHandler } from ".";
-export class BunClient<CustomClient extends BunClient<CustomClient>> extends Client {
-  private commandHandler: CommandHandler<CustomClient>;
-  private interactionAwaiter: InteractionAwaiter<CustomClient>;
-  private listenerHandler: ListenerHandler<CustomClient>;
-  public console: BunConsole;
+import { randomUUID } from "crypto";
+import type { BunCommand } from "@client";
+import type {
+  ChatInputCommandInteraction,
+  ContextMenuCommandInteraction,
+} from "discord.js";
+
+export interface CommandErrorPayload {
+  command: BunCommand;
+  interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction;
+  error: unknown;
+}
+
+declare module "discord.js" {
+  interface ClientEvents {
+    commandError: [payload: CommandErrorPayload];
+  }
+}
+
+export class BunClient extends Client {
+  public readonly commandHandler: CommandHandler;
+  public readonly interactionAwaiter: InteractionAwaiter;
+  public readonly listenerHandler: ListenerHandler;
+  public readonly logger: BunConsole;
+  private loaded = false;
 
   declare options: BunClientOptions &
     Omit<ClientOptions, "intents"> & { intents: IntentsBitField };
 
-  constructor(options: BunClientOptions) {
+  constructor(options: BunClientOptions & ClientOptions) {
     super(options);
 
-    // @ts-expect-error
     this.commandHandler = new CommandHandler(this);
-    this.commandHandler.loadCommands();
-
-    // @ts-expect-error
     this.listenerHandler = new ListenerHandler(this);
-
-    // @ts-expect-error
     this.interactionAwaiter = new InteractionAwaiter(this);
 
-    this.console = new BunConsole();
+    this.logger = new BunConsole();
 
-    this.on("ready", () => {
-      this.commandHandler?.registerCommands();
+    this.once(Events.ClientReady, () => {
+      this.commandHandler.registerCommands().catch((error) => {
+        this.logger.error("Failed to register commands:", error);
+      });
     });
 
-    this.on("interactionCreate", async (interaction: Interaction) => {
-      this.commandHandler?.handleInteraction(interaction);
+    this.on(Events.InteractionCreate, (interaction: Interaction) => {
+      this.commandHandler.handleInteraction(interaction).catch((error) => {
+        this.logger.error("Error handling interaction:", error);
+      });
     });
   }
 
-  login() {
-    return super.login(this.options.token);
+  /** @deprecated Use {@link logger} instead. */
+  public get console(): BunConsole {
+    return this.logger;
   }
 
-  stop() {
-    return super.destroy();
+  /** Load commands + listeners. Idempotent; called automatically by login(). */
+  public async loadAll(): Promise<void> {
+    if (this.loaded) return;
+    this.loaded = true;
+    await this.commandHandler.loadCommands();
+    await this.listenerHandler.loadListeners();
   }
 
+  public override async login(token?: string): Promise<string> {
+    await this.loadAll();
+    return super.login(token ?? this.options.token ?? process.env.DISCORD_TOKEN);
+  }
+
+  /**
+   * Wait for a component/modal interaction with a static customId.
+   * Multiple callers can await the same id — scope with `filter`
+   * (e.g. by user or message) and always pass `time`.
+   */
+  public awaitInteraction<T extends Interaction>(
+    customId: string,
+    options?: AwaitInteractionOptions<T> & { maxUses?: 1 }
+  ): Promise<T>;
+  public awaitInteraction<T extends Interaction>(
+    customId: string,
+    options: AwaitInteractionOptions<T> & { maxUses: number }
+  ): Promise<T[]>;
+  public awaitInteraction<T extends Interaction>(
+    customId: string,
+    options: AwaitInteractionOptions<T> & { maxUses?: number } = {}
+  ): Promise<T | T[]> {
+    const awaiter = this.interactionAwaiter.awaitInteraction as (
+      customId: string,
+      options: AwaitInteractionOptions<T> & { maxUses?: number }
+    ) => Promise<T | T[]>;
+    return awaiter.call(this.interactionAwaiter, customId, options);
+  }
+
+  /**
+   * Collect every matching interaction until `time`/`max`/`stop()`.
+   * Unlike `awaitInteraction`, one call observes many interactions —
+   * via `.on('collect')` events or `for await` iteration.
+   */
+  public collectInteractions<T extends Interaction>(
+    customId: string,
+    options: CollectOptions<T> = {}
+  ): InteractionCollector<T> {
+    return this.interactionAwaiter.collect<T>(customId, options);
+  }
+
+  /**
+   * @deprecated Use {@link awaitInteraction} instead.
+   */
   public await<T extends Interaction>(
     customId: string,
     maxUses = 1
-  ): CustomListener<T> {
-    return this.interactionAwaiter!!.await<T>(customId, maxUses);
+  ): Promise<T | T[]> {
+    return this.interactionAwaiter.awaitInteraction<T>(customId, {
+      maxUses: maxUses as 1,
+    });
   }
 
+  /**
+   * Build a namespaced customId (`action` or `action:state`) within Discord's
+   * 1-100 character limit. Prefer one stable id per action and disambiguate
+   * concurrent uses with `awaitInteraction` filters, not random ids.
+   */
+  public createCustomId(action: string, state?: string | number): string {
+    return createCustomId(action, state);
+  }
+
+  public parseCustomId(customId: string): { action: string; state?: string } {
+    return parseCustomId(customId);
+  }
+
+  /**
+   * @deprecated Prefer stable ids via {@link createCustomId} plus
+   * `awaitInteraction` filters. Kept for backwards compatibility.
+   */
   public makeRandom(customId: string): string {
-    return `${this.readyTimestamp}:${customId}:${this.makeRandomInteger(
-      0,
-      1000000
-    )}`;
-  }
-
-  makeRandomInteger(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1) + min);
+    return `${customId}:${randomUUID().split("-")[0]}`;
   }
 }

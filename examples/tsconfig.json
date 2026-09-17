@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true,
+    "baseUrl": ".",
+    "rootDir": "..",
+    "paths": {
+      "@bybackfish/buncord": ["../src/index.ts"],
+      "@/*": ["../src/*"],
+      "@client/*": ["../src/client/*"],
+      "@struct/*": ["../src/struct/*"],
+      "@client": ["../src/client/"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}

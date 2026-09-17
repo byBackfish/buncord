@@ -1,0 +1,14 @@
+{
+  "name": "buncord-example",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@bybackfish/buncord": "file:..",
+    "discord.js": "^14.27.0",
+    "zod": "^3.22.4"
+  }
+}
