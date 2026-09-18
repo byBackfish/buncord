@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Fix: `CommandHandler.add()` now wires `client` onto nested subcommands and
+  groups, not just the root command. Previously `this.client` was
+  `undefined` inside subcommand leaves (found via a paginated bot command
+  crashing on `client.awaitInteraction`).
+
 ## 0.4.0 — 2026-09-17
 
 Breaking. discord.js raised to `^14.27.0`.

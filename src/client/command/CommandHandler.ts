@@ -112,9 +112,20 @@ export class CommandHandler {
     if (!command?.name) throw new Error('Cannot add a command without a name');
     const key = keyFor(command.data.type ?? ApplicationCommandType.ChatInput, command.name);
     if (this.commands.has(key)) throw new Error(`Duplicate command: ${key}`);
-    command.client = this.client;
+    this.assignClient(command);
     this.commands.set(key, command);
     return this;
+  }
+
+  /**
+   * Wire the client onto a command and all of its nested subcommands/groups.
+   * Without this, `this.client` is undefined inside subcommand leaves, since
+   * only the root is ever passed through `add()` (including via
+   * `loadCommands()` directory loading).
+   */
+  private assignClient(command: BunCommand): void {
+    command.client = this.client;
+    for (const sub of command.data.subcommands ?? []) this.assignClient(sub);
   }
 
   public async loadCommands(): Promise<void> {
